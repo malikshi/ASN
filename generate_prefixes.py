@@ -1,5 +1,6 @@
 import requests
 import ipaddress
+import json
 
 asns = ['23693', '24203', '4761', '45727', '13335']
 all_ipv4_prefixes = set()
@@ -8,7 +9,11 @@ all_ipv6_prefixes = set()
 for asn in asns:
     url = f'https://api.bgpview.io/asn/{asn}/prefixes'
     response = requests.get(url)
-    data = response.json()['data']
+    try:
+        data = response.json()['data']
+    except json.decoder.JSONDecodeError:
+        print("Error: Invalid JSON format in API response")
+        continue
     parent_ipv4_prefixes = set()
     parent_ipv6_prefixes = set()
 

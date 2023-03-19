@@ -9,11 +9,7 @@ all_ipv6_prefixes = set()
 for asn in asns:
     url = f'https://api.bgpview.io/asn/{asn}/prefixes'
     response = requests.get(url)
-    try:
-        data = response.json()['data']
-    except json.decoder.JSONDecodeError:
-        print("Error: Invalid JSON format in API response")
-        continue
+    data = response.json()['data']
     parent_ipv4_prefixes = set()
     parent_ipv6_prefixes = set()
 

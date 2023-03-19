@@ -26,7 +26,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Generate prefixes
-      run: python generate_prefixes.py
+      run: |
+        export http_proxy=http://94.130.231.91:8080
+        export https_proxy=http://94.130.231.91:8080
+        python generate_prefixes.py
 
 # Commit changed files to your repo
     - name: Git Auto Commit

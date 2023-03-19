@@ -4,12 +4,15 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 04 * * FRI"
+  workflow_dispatch:
 
 jobs:
   generate_and_commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup Python
       uses: actions/setup-python@v2
@@ -24,10 +27,11 @@ jobs:
     - name: Generate prefixes
       run: python generate_prefixes.py
 
-    - name: Commit changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add -A
-        git commit -m "Update prefixes"
-        git push
+# Commit changed files to your repo
+    - name: Git Auto Commit
+      uses: stefanzweifel/git-auto-commit-action@v4.16.0
+      with:
+        # Commit message
+        commit_message: automatic/regular prefixes updates
+        # File pattern used for `git add`. For example `src/*.js`
+        file_pattern: ./asn*.txt

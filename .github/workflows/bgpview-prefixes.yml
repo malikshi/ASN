@@ -1,0 +1,33 @@
+name: Generate and commit prefixes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate_and_commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Generate prefixes
+      run: python generate_prefixes.py
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git commit -m "Update prefixes"
+        git push

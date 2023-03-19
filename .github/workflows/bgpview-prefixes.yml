@@ -27,8 +27,8 @@ jobs:
 
     - name: Generate prefixes
       run: |
-        export http_proxy=http://5.161.201.220:8080
-        export https_proxy=http://5.161.201.220:8080
+        export http_proxy=http://44.197.39.173:9999
+        export https_proxy=http://44.197.39.173:9999
         python generate_prefixes.py
 
 # Commit changed files to your repo

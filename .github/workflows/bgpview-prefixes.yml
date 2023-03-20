@@ -27,10 +27,8 @@ jobs:
 
     - name: Generate prefixes
       run: |
-        # export http_proxy=http://206.189.146.13:8080
-        # export https_proxy=http://206.189.146.13:8080
-        export HTTP_PROXY=socks5://118.27.0.171:7497
-        export HTTPS_PROXY=socks5://118.27.0.171:7497
+        export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
+        export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt

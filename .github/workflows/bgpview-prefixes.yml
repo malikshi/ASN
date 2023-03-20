@@ -39,6 +39,9 @@ jobs:
         curl -sSL https://www.cloudflare.com/ips-v6 >> asn13335.txt
         perl -i -lne 'print unless $seen{$_}++' asn13335.txt
 
+    - name: Generate prefixes
+      run: python generate_ufw.py
+
 # Commit changed files to your repo
     - name: Git Auto Commit
       uses: stefanzweifel/git-auto-commit-action@v4.16.0
@@ -46,4 +49,4 @@ jobs:
         # Commit message
         commit_message: automatic/regular prefixes updates
         # File pattern used for `git add`. For example `src/*.js`
-        file_pattern: ./asn*.txt
+        file_pattern: ./*.txt

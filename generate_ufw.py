@@ -43,9 +43,8 @@ networks = ipv4_networks + ipv6_networks
 # Sort the networks in ascending order by the IP address
 networks.sort(key=lambda x: (x.version, x.network_address))
 
-# Create an empty list to store the allowed networks and IP addresses
+# Create an empty list to store the allowed networks
 allowed_networks = []
-allowed_ips = []
 
 # Loop through the networks
 for network in networks:
@@ -55,13 +54,11 @@ for network in networks:
         if network.overlaps(allowed_network):
             overlap = True
             break
-    # If the network does not overlap, add it to the allowed networks and IP addresses
+    # If the network does not overlap, add it to the allowed networks
     if not overlap:
         allowed_networks.append(network)
-        for ip in network:
-            allowed_ips.append(ip)
 
-# Open the output file for writing the UFW rules
+# Open the output file for writing
 with open(output_file, "w") as f_out:
     # Loop through the allowed networks
     for network in allowed_networks:
@@ -73,13 +70,18 @@ with open(output_file, "w") as f_out:
             # Write the IPv6 UFW rule
             f_out.write(f"ufw allow from {network} to any\n")
 
-# Open the output file for writing the allowed IP addresses
+# Open the ip list for writing
 with open(ip_list_file, "w") as f_out:
-    # Loop through the allowed IP addresses
-    for ip in allowed_ips:
-        # Write the IP address
-        f_out.write(f"{ip}\n")
+    # Loop through the allowed networks
+    for network in allowed_networks:
+        # Check if it's an IPv4 or IPv6 address
+        if network.version == 4:
+            # Write the IPv4 addresses
+            f_out.write(f"{network}\n")
+        else:
+            # Write the IPv6 addresses
+            f_out.write(f"{network}\n")
 
-# Print a message indicating the output file paths
+# Print a message indicating the output file path
 print(f"UFW rules written to {os.path.abspath(output_file)}")
-print(f"Allowed IP addresses written to {os.path.abspath(ip_list_file)}")
+print(f"Allowed Networks written to {os.path.abspath(ip_list_file)}")

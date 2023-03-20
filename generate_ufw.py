@@ -4,6 +4,7 @@ import ipaddress
 # Define the input and output file paths
 input_files = ["asn13335.txt", "asn133798.txt", "asn23693.txt", "asn24203.txt", "asn45727.txt", "asn4761.txt"]
 output_file = "ufw_rules.txt"
+ip_list_file = "ip_list.txt"
 
 # Create empty lists to store IPv4 and IPv6 networks
 ipv4_networks = []
@@ -42,8 +43,9 @@ networks = ipv4_networks + ipv6_networks
 # Sort the networks in ascending order by the IP address
 networks.sort(key=lambda x: (x.version, x.network_address))
 
-# Create an empty list to store the allowed networks
+# Create an empty list to store the allowed networks and IP addresses
 allowed_networks = []
+allowed_ips = []
 
 # Loop through the networks
 for network in networks:
@@ -53,11 +55,13 @@ for network in networks:
         if network.overlaps(allowed_network):
             overlap = True
             break
-    # If the network does not overlap, add it to the allowed networks
+    # If the network does not overlap, add it to the allowed networks and IP addresses
     if not overlap:
         allowed_networks.append(network)
+        for ip in network:
+            allowed_ips.append(ip)
 
-# Open the output file for writing
+# Open the output file for writing the UFW rules
 with open(output_file, "w") as f_out:
     # Loop through the allowed networks
     for network in allowed_networks:
@@ -69,5 +73,13 @@ with open(output_file, "w") as f_out:
             # Write the IPv6 UFW rule
             f_out.write(f"ufw allow from {network} to any\n")
 
-# Print a message indicating the output file path
+# Open the output file for writing the allowed IP addresses
+with open(ip_list_file, "w") as f_out:
+    # Loop through the allowed IP addresses
+    for ip in allowed_ips:
+        # Write the IP address
+        f_out.write(f"{ip}\n")
+
+# Print a message indicating the output file paths
 print(f"UFW rules written to {os.path.abspath(output_file)}")
+print(f"Allowed IP addresses written to {os.path.abspath(ip_list_file)}")

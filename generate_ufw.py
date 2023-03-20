@@ -20,24 +20,27 @@ for input_file in input_files:
             # Skip any comment lines
             if line.startswith("#"):
                 continue
-            # Check if the line contains a slash character
-            if "/" not in line:
-                continue
             # Parse the IP address and prefix length
-            ip, prefix = line.split("/")
+            parts = line.split("/")
+            if len(parts) != 2:
+                continue
+            ip, prefix = parts
             # Create an IPv4 or IPv6 object
-            if ":" in ip:
-                network = ipaddress.IPv6Network(line, strict=False)
-                ipv6_networks.append(network)
-            else:
-                network = ipaddress.IPv4Network(line, strict=False)
-                ipv4_networks.append(network)
+            try:
+                if ":" in ip:
+                    network = ipaddress.IPv6Network(line, strict=False)
+                    ipv6_networks.append(network)
+                else:
+                    network = ipaddress.IPv4Network(line, strict=False)
+                    ipv4_networks.append(network)
+            except ValueError:
+                pass
 
 # Combine the IPv4 and IPv6 networks
 networks = ipv4_networks + ipv6_networks
 
 # Sort the networks in ascending order by the IP address
-networks.sort(key=lambda x: x.network_address)
+networks.sort(key=lambda x: (x.version, x.network_address))
 
 # Create an empty list to store the allowed networks
 allowed_networks = []

@@ -30,6 +30,14 @@ jobs:
         export http_proxy=http://5.78.81.219:8080
         export https_proxy=http://5.78.81.219:8080
         python generate_prefixes.py
+    - name: Extended Prefix Cloudlare
+      run: |
+        echo "#Extended IPv4" >> asn13335.txt
+        curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt
+        echo "" >> asn13335.txt
+        echo "#Extended IPv6" >> asn13335.txt
+        curl -sSL https://www.cloudflare.com/ips-v6 >> asn13335.txt
+        perl -i -lne 'print unless $seen{$_}++' asn13335.txt
 
 # Commit changed files to your repo
     - name: Git Auto Commit

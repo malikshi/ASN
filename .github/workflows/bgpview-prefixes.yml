@@ -29,10 +29,9 @@ jobs:
       run: |
         # export http_proxy=http://206.189.146.13:8080
         # export https_proxy=http://206.189.146.13:8080
-        sudo sh -c "$(curl -L https://hubmirror.v2raya.org/raw/mzz2017/gg/main/release/go.sh)"
-        gg config -w node=vmess://eyJhZGQiOiAiZmRmNy52OTk2Ni5zaG9wIiwgImFpZCI6IDAsICJob3N0IjogIiIsICJpZCI6ICIyYWViMjZlMC1jMWMwLTExZWQtYjMzMS0yMDVjNmQ1ZjVkNzgiLCAibmV0IjogIndzIiwgInBhdGgiOiAiIiwgInBvcnQiOiA0NDMsICJwcyI6ICJnaXRodWIuY29tL2ZyZWVmcSAtIFx1N2Y4ZVx1NTZmZENsb3VkRmxhcmVcdTgyODJcdTcwYjkgMjAiLCAidGxzIjogInRscyIsICJ0eXBlIjogImF1dG8iLCAic2VjdXJpdHkiOiAiYXV0byIsICJza2lwLWNlcnQtdmVyaWZ5IjogdHJ1ZSwgInNuaSI6ICIifQ==
-        gg curl ipv4.appspot.com
-        gg python generate_prefixes.py
+        export HTTP_PROXY=socks5://162.0.220.218:15806
+        export HTTPS_PROXY=socks5://162.0.220.218:15806
+        python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt
         echo "" >> asn13335.txt

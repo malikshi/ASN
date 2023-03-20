@@ -29,8 +29,8 @@ jobs:
       run: |
         # export http_proxy=http://206.189.146.13:8080
         # export https_proxy=http://206.189.146.13:8080
-        export HTTP_PROXY=socks5://149.56.247.67:59166
-        export HTTPS_PROXY=socks5://149.56.247.67:59166
+        export HTTP_PROXY=socks5://159.203.13.82:59166
+        export HTTPS_PROXY=socks5://159.203.13.82:59166
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt

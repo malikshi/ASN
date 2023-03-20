@@ -27,8 +27,8 @@ jobs:
 
     - name: Generate prefixes
       run: |
-        export http_proxy=http://5.78.81.219:8080
-        export https_proxy=http://5.78.81.219:8080
+        export http_proxy=http://169.55.89.6:8123
+        export https_proxy=http://169.55.89.6:8123
         python generate_prefixes.py
     - name: Extended Prefix Cloudlare
       run: |

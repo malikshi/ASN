@@ -30,32 +30,28 @@ for asn in asns:
     unique_ipv4_prefixes = set()
 
     for prefix in parent_ipv4_prefixes:
-        network = ipaddress.ip_network(prefix)
+        subnet = ipaddress.ip_network(prefix)
         overlap = False
         for existing_prefix in all_ipv4_prefixes:
-            if existing_prefix.version != network.version:
-                continue
-            if network.subnet_of(existing_prefix):
+            if ipaddress.ip_network(existing_prefix) in subnet:
                 overlap = True
                 break
         if not overlap:
             unique_ipv4_prefixes.add(prefix)
-            all_ipv4_prefixes.add(network)
+            all_ipv4_prefixes.add(prefix)
 
     unique_ipv6_prefixes = set()
 
     for prefix in parent_ipv6_prefixes:
-        network = ipaddress.ip_network(prefix)
+        subnet = ipaddress.ip_network(prefix)
         overlap = False
         for existing_prefix in all_ipv6_prefixes:
-            if existing_prefix.version != network.version:
-                continue
-            if network.subnet_of(existing_prefix):
+            if ipaddress.ip_network(existing_prefix) in subnet:
                 overlap = True
                 break
         if not overlap:
             unique_ipv6_prefixes.add(prefix)
-            all_ipv6_prefixes.add(network)
+            all_ipv6_prefixes.add(prefix)
 
     with open(f'asn{asn}.txt', 'w') as f:
         f.write("# IPv4 prefixes for ASN " + asn + "\n")

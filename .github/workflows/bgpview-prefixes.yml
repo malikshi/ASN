@@ -29,8 +29,8 @@ jobs:
       run: |
         # export http_proxy=http://206.189.146.13:8080
         # export https_proxy=http://206.189.146.13:8080
-        export HTTP_PROXY=socks5://162.0.220.218:15806
-        export HTTPS_PROXY=socks5://162.0.220.218:15806
+        export HTTP_PROXY=socks5://158.69.52.218:9300
+        export HTTPS_PROXY=socks5://158.69.52.218:9300
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt
@@ -39,7 +39,7 @@ jobs:
         curl -sSL https://www.cloudflare.com/ips-v6 >> asn13335.txt
         perl -i -lne 'print unless $seen{$_}++' asn13335.txt
 
-    - name: Generate prefixes
+    - name: Generate ufw rules
       run: python generate_ufw.py
 
 # Commit changed files to your repo

@@ -20,6 +20,9 @@ for input_file in input_files:
             # Skip any comment lines
             if line.startswith("#"):
                 continue
+            # Check if the line contains a slash character
+            if "/" not in line:
+                continue
             # Parse the IP address and prefix length
             ip, prefix = line.split("/")
             # Create an IPv4 or IPv6 object

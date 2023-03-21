@@ -25,21 +25,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up SOCKS5 proxy
-      uses: jokermonn/socks5-action@v1
-      with:
-        socks-port: ${{ secrets.SOCKS_PORT }}
-        socks-host: ${{ secrets.SOCKS_ADDRESS }}
-        socks-user: ${{ secrets.SOCKS_USERNAME }}
-        socks-pass: ${{ secrets.SOCKS_PASSWORD }}
+    - name: Set up Privoxy and SOCKS5 proxy
+      env:
+        USER: ${{ secrets.SOCKS_USERNAME }}
+        PASS: ${{ secrets.SOCKS_PASSWORD }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y privoxy
+        echo "forward-socks5 / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ."
+        echo "forward-socks5t / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ."
+        echo "auth-mETHOD \"$USER:$PASS\"" >> /etc/privoxy/config
+        sudo service privoxy restart
 
     - name: Generate prefixes
-      env:  
-        http_proxy: socks5://{{ secrets.SOCKS_USERNAME }}:{{ secrets.SOCKS_PASSWORD }}@${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }}
-        https_proxy: socks5://{{ secrets.SOCKS_USERNAME }}:{{ secrets.SOCKS_PASSWORD }}@${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }}
+      env:
+          http_proxy: http://localhost:8118
+          https_proxy: http://localhost:8118
       run: |
-        # export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
-        # export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt

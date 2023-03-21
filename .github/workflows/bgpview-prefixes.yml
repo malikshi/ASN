@@ -25,15 +25,34 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up Squid and SOCKS5 proxy
+    - name: Set up SOCKS5 proxy with Dante
       run: |
         sudo apt-get update
-        sudo apt-get install -y squid
-        sudo sh -c 'echo "cache_peer ${{ secrets.SOCKS_ADDRESS }} parent ${{ secrets.SOCKS_PORT }} 0 no-query no-digest login=$USER:$PASS" >> /etc/squid/squid.conf'
-        sudo service squid restart
+        sudo apt-get install -y dante-server
+        sudo sh -c 'echo "internal: ${{ secrets.SOCKS_ADDRESS }} port = ${{ secrets.SOCKS_PORT }}" >> /etc/sockd.conf'
+        sudo sh -c 'echo "method: username" >> /etc/sockd.conf'
+        sudo sh -c 'echo "user.privileged: root" >> /etc/sockd.conf'
+        sudo sh -c 'echo "user.unprivileged: nobody" >> /etc/sockd.conf'
+        sudo sh -c 'echo "user.libwrap: nobody" >> /etc/sockd.conf'
+        sudo sh -c 'echo "client pass {" >> /etc/sockd.conf'
+        sudo sh -c 'echo "from: 0.0.0.0/0 to: 0.0.0.0/0" >> /etc/sockd.conf'
+        sudo sh -c 'echo "log: connect disconnect error" >> /etc/sockd.conf'
+        sudo sh -c 'echo "}" >> /etc/sockd.conf'
+        sudo sh -c 'echo "socks pass {" >> /etc/sockd.conf'
+        sudo sh -c 'echo "from: 0.0.0.0/0 to: 0.0.0.0/0" >> /etc/sockd.conf'
+        sudo sh -c 'echo "log: connect disconnect error" >> /etc/sockd.conf'
+        sudo sh -c 'echo "}" >> /etc/sockd.conf'
+        sudo service sockd restart
       env:
-        USER: ${{ secrets.SOCKS_USERNAME }}
-        PASS: ${{ secrets.SOCKS_PASSWORD }}
+        SOCKS_USERNAME: ${{ secrets.SOCKS_USERNAME }}
+        SOCKS_PASSWORD: ${{ secrets.SOCKS_PASSWORD }}
+
+    - name: Test SOCKS5 connection
+      env:
+        http_proxy: socks5h://localhost:1080
+        https_proxy: socks5h://localhost:1080
+      run: |
+        curl -s https://api.ipify.org/
 
     - name: Generate prefixes
       run: |

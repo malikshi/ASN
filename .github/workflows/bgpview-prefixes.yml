@@ -17,7 +17,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.7'
+        python-version: '3.11'
         cache: 'pip'
 
     - name: Install dependencies
@@ -25,25 +25,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Python and ProxyBroker
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y jq
-        pip install proxybroker
-
-    - name: Test SOCKS5 connection
-      run: |
-        proxy_list=$(proxybroker find --types SOCKS5 --lvl High --countries US --strict -l 10 --format json)
-        proxy_host=$(echo "$proxy_list" | jq -r '.[0].host')
-        proxy_port=$(echo "$proxy_list" | jq -r '.[0].port')
-        export http_proxy="socks5h://$proxy_host:$proxy_port"
-        export https_proxy="socks5h://$proxy_host:$proxy_port"
-        curl -s https://api.ipify.org/
-
     - name: Generate prefixes
       run: |
-        # export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
-        # export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
+        export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
+        export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt

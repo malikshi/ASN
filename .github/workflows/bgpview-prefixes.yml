@@ -39,8 +39,8 @@ jobs:
 
     - name: Test SOCKS5 connection
       env:
-        http_proxy: http://localhost:8118
-        https_proxy: http://localhost:8118
+        http_proxy: http://127.0.0.1:8118
+        https_proxy: http://127.0.0.1:8118
       run: |
         curl -s --socks5-hostname ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} https://api.ipify.org/
 

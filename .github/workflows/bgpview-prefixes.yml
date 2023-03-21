@@ -39,8 +39,6 @@ jobs:
       env:
         http_proxy: http://localhost:3128
         https_proxy: http://localhost:3128
-      run: |
-        curl -s --socks5-hostname ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} https://api.ipify.org/
 
     - name: Generate prefixes
       run: |

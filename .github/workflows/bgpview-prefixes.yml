@@ -17,7 +17,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.7'
         cache: 'pip'
 
     - name: Install dependencies
@@ -28,8 +28,8 @@ jobs:
     - name: Install Python and ProxyBroker
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3 python3-pip jq
-        pip3 install proxybroker
+        sudo apt-get install -y jq
+        pip install proxybroker
 
     - name: Test SOCKS5 connection
       run: |

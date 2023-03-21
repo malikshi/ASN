@@ -25,25 +25,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up Privoxy and SOCKS5 proxy
+    - name: Set up Squid and SOCKS5 proxy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y squid
+        sudo sh -c 'echo "cache_peer ${{ secrets.SOCKS_ADDRESS }} parent ${{ secrets.SOCKS_PORT }} 0 no-query no-digest login=$USER:$PASS" >> /etc/squid/squid.conf'
+        sudo service squid restart
       env:
         USER: ${{ secrets.SOCKS_USERNAME }}
         PASS: ${{ secrets.SOCKS_PASSWORD }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y privoxy
-        sudo sh -c 'echo "forward-socks5t / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ." | sudo tee -a /etc/privoxy/config > /dev/null
-        sudo sh -c 'echo "auth socks5 \"$USER:$PASS\"" | sudo tee -a /etc/privoxy/config > /dev/null
-
-        # sudo sh -c 'echo "forward-socks5 / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ." >> /etc/privoxy/config'
-        # sudo sh -c 'echo "forward-socks5t / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ." >> /etc/privoxy/config'
-        # sudo sh -c 'echo "auth-mETHOD \"$USER:$PASS\"" >> /etc/privoxy/config'
-        sudo service privoxy restart
 
     - name: Test SOCKS5 connection
       env:
-        http_proxy: http://127.0.0.1:8118
-        https_proxy: http://127.0.0.1:8118
+        http_proxy: http://localhost:3128
+        https_proxy: http://localhost:3128
       run: |
         curl -s --socks5-hostname ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} https://api.ipify.org/
 

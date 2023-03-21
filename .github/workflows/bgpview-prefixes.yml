@@ -37,10 +37,14 @@ jobs:
         sudo sh -c 'echo "auth-mETHOD \"$USER:$PASS\"" >> /etc/privoxy/config'
         sudo service privoxy restart
 
-    - name: Generate prefixes
+    - name: Test SOCKS5 connection
       env:
-          http_proxy: http://localhost:8118
-          https_proxy: http://localhost:8118
+        http_proxy: http://localhost:8118
+        https_proxy: http://localhost:8118
+      run: |
+        curl -s --socks5-hostname ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} https://api.ipify.org/
+
+    - name: Generate prefixes
       run: |
         python generate_prefixes.py
         echo "#Extended IPv4" >> asn13335.txt

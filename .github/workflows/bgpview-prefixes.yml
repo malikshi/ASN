@@ -32,9 +32,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y privoxy
-        echo "forward-socks5 / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ."
-        echo "forward-socks5t / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ."
-        echo "auth-mETHOD \"$USER:$PASS\"" >> /etc/privoxy/config
+        sudo sh -c 'echo "forward-socks5 / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ." >> /etc/privoxy/config'
+        sudo sh -c 'echo "forward-socks5t / ${{ secrets.SOCKS_ADDRESS }}:${{ secrets.SOCKS_PORT }} ." >> /etc/privoxy/config'
+        sudo sh -c 'echo "auth-mETHOD \"$USER:$PASS\"" >> /etc/privoxy/config'
         sudo service privoxy restart
 
     - name: Generate prefixes

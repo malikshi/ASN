@@ -35,11 +35,6 @@ jobs:
         USER: ${{ secrets.SOCKS_USERNAME }}
         PASS: ${{ secrets.SOCKS_PASSWORD }}
 
-    - name: Test SOCKS5 connection
-      env:
-        http_proxy: http://localhost:3128
-        https_proxy: http://localhost:3128
-
     - name: Generate prefixes
       run: |
         python generate_prefixes.py
@@ -49,6 +44,9 @@ jobs:
         echo "#Extended IPv6" >> asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v6 >> asn13335.txt
         perl -i -lne 'print unless $seen{$_}++' asn13335.txt
+      env:
+        http_proxy: http://localhost:3128
+        https_proxy: http://localhost:3128
 
     - name: Generate ufw rules
       run: python generate_ufw.py

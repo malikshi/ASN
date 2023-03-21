@@ -42,7 +42,8 @@ jobs:
         sudo sh -c 'echo "from: 0.0.0.0/0 to: 0.0.0.0/0" >> /etc/sockd.conf'
         sudo sh -c 'echo "log: connect disconnect error" >> /etc/sockd.conf'
         sudo sh -c 'echo "}" >> /etc/sockd.conf'
-        sudo service sockd restart
+        sudo systemctl restart sockd
+        sudo systemctl enable sockd
       env:
         SOCKS_USERNAME: ${{ secrets.SOCKS_USERNAME }}
         SOCKS_PASSWORD: ${{ secrets.SOCKS_PASSWORD }}

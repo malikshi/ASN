@@ -2,7 +2,7 @@ import os
 import ipaddress
 
 # Define the input and output file paths
-input_files = ["asn13335.txt", "asn133798.txt", "asn23693.txt", "asn24203.txt", "asn45727.txt", "asn4761.txt"]
+input_files = ["asn13335.txt", "asn133798.txt", "asn23693.txt", "asn24203.txt", "asn45727.txt", "asn4761.txt", "asn7713.txt"]
 output_file = "ufw_rules.txt"
 ip_list_file = "ip_list.txt"
 

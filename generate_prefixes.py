@@ -2,18 +2,20 @@
 import requests
 import ipaddress
 import json
-# id, dns, jp, ph, my, ar, th, vn, la, mm, kh
-asns = ['23693', '24203', '4761', '45727', '13335', '133798', '7713', '398962', '2516', '17676', '4713', '9605', '2527', '4788', '9534', '4818', '9930', '38466', '9299', '17639', '132199', '4775', '10139', '7303', '27747', '22927', '11664', '11315', '131445', '133481', '45629', '23969', '24378', '7552', '45899', '18403', '131429', '45543', '9873', '131267', '10226', '24337', '132513', '136255', '58952', '133385', '9988', '132167', '38623', '45498', '131178', '17976', '38901']
+
+input_files = ["asn13335.txt", "asn133798.txt", "asn23693.txt", "asn24203.txt", "asn45727.txt", "asn4761.txt", "asn7713.txt", "asn398962.txt", "asn2516.txt", "asn17676.txt", "asn4713.txt", "asn9605.txt", "asn2527.txt", "asn4788.txt", "asn9534.txt", "asn4818.txt", "asn9930.txt", "asn38466.txt", "asn9299.txt", "asn17639.txt", "asn132199.txt", "asn4775.txt", "asn10139.txt", "asn7303.txt", "asn27747.txt", "asn22927.txt", "asn11664.txt", "asn11315.txt", "asn131445.txt", "asn133481.txt", "asn45629.txt", "asn23969.txt", "asn24378.txt", "asn7552.txt", "asn45899.txt", "asn18403.txt", "asn131429.txt", "asn45543.txt", "asn9873.txt", "asn131267.txt", "asn10226.txt", "asn24337.txt", "asn132513.txt", "asn136255.txt", "asn58952.txt", "asn133385.txt", "asn9988.txt", "asn132167.txt", "asn38623.txt", "asn45498.txt", "asn131178.txt", "asn17976.txt", "asn38901.txt"]
+
 all_ipv4_prefixes = set()
 all_ipv6_prefixes = set()
 
-for asn in asns:
+for input_file in input_files:
+    asn = input_file[3:-4]
     url = f'https://api.bgpview.io/asn/{asn}/prefixes'
     response = requests.get(url)
     try:
         data = response.json()['data']
     except json.decoder.JSONDecodeError:
-        print("Error: Invalid JSON format in API response")
+        print(f"Error: Invalid JSON format in API response for ASN {asn}")
         continue
     parent_ipv4_prefixes = set()
     parent_ipv6_prefixes = set()
@@ -68,7 +70,7 @@ for asn in asns:
             unique_ipv6_prefixes.add(prefix)
             all_ipv6_prefixes.add(network)
 
-    with open(f'asn{asn}.txt', 'w') as f:
+    with open(input_file, 'w') as f:
         f.write("# IPv4 prefixes for ASN " + asn + "\n")
         for prefix in unique_ipv4_prefixes:
             f.write(prefix + '\n')
@@ -78,4 +80,4 @@ for asn in asns:
             f.write(prefix + '\n')
         f.write("\n")
 
-    print(f"Prefixes written to asn{asn}.txt file")
+    print(f"Prefixes written to {input_file} file")

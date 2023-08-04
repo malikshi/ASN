@@ -701,7 +701,7 @@ ufw allow from 64.204.0.0/15 to any
 ufw allow from 64.222.64.0/18 to any
 ufw allow from 64.224.21.0/24 to any
 ufw allow from 64.224.96.0/19 to any
-ufw allow from 64.224.128.0/17 to any
+ufw allow from 64.224.128.0/20 to any
 ufw allow from 64.226.56.0/21 to any
 ufw allow from 65.18.112.0/20 to any
 ufw allow from 65.48.128.0/17 to any

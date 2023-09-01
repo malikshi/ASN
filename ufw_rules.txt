@@ -692,6 +692,7 @@ ufw allow from 59.102.0.0/17 to any
 ufw allow from 59.103.0.0/16 to any
 ufw allow from 59.128.0.0/12 to any
 ufw allow from 59.144.0.0/15 to any
+ufw allow from 59.146.0.0/16 to any
 ufw allow from 59.147.0.0/16 to any
 ufw allow from 59.148.0.0/15 to any
 ufw allow from 59.151.128.0/18 to any
@@ -1636,6 +1637,7 @@ ufw allow from 120.88.176.0/20 to any
 ufw allow from 120.88.192.0/18 to any
 ufw allow from 120.96.0.0/11 to any
 ufw allow from 120.132.0.0/17 to any
+ufw allow from 120.140.0.0/15 to any
 ufw allow from 120.158.0.0/15 to any
 ufw allow from 120.160.0.0/11 to any
 ufw allow from 120.192.0.0/10 to any
@@ -2881,7 +2883,6 @@ ufw allow from 200.127.0.0/17 to any
 ufw allow from 200.127.128.0/17 to any
 ufw allow from 200.136.0.0/16 to any
 ufw allow from 200.142.192.0/20 to any
-ufw allow from 201.0.0.0/16 to any
 ufw allow from 201.40.0.0/15 to any
 ufw allow from 201.149.0.0/19 to any
 ufw allow from 201.176.0.0/14 to any

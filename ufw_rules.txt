@@ -292,6 +292,7 @@ ufw allow from 27.109.112.0/22 to any
 ufw allow from 27.109.116.0/22 to any
 ufw allow from 27.110.128.0/17 to any
 ufw allow from 27.111.96.0/19 to any
+ufw allow from 27.111.224.0/20 to any
 ufw allow from 27.114.0.0/17 to any
 ufw allow from 27.121.104.0/22 to any
 ufw allow from 27.122.112.0/20 to any
@@ -935,6 +936,7 @@ ufw allow from 103.55.92.0/22 to any
 ufw allow from 103.55.157.0/24 to any
 ufw allow from 103.56.48.0/22 to any
 ufw allow from 103.56.156.0/22 to any
+ufw allow from 103.56.174.0/24 to any
 ufw allow from 103.57.28.0/22 to any
 ufw allow from 103.57.44.0/22 to any
 ufw allow from 103.60.168.0/22 to any
@@ -975,7 +977,9 @@ ufw allow from 103.125.192.0/22 to any
 ufw allow from 103.130.64.0/22 to any
 ufw allow from 103.131.68.0/22 to any
 ufw allow from 103.141.100.0/23 to any
+ufw allow from 103.141.164.0/23 to any
 ufw allow from 103.143.206.0/23 to any
+ufw allow from 103.145.17.0/24 to any
 ufw allow from 103.145.32.0/23 to any
 ufw allow from 103.145.136.0/23 to any
 ufw allow from 103.148.56.0/23 to any
@@ -1283,6 +1287,7 @@ ufw allow from 112.140.188.0/22 to any
 ufw allow from 112.140.192.0/18 to any
 ufw allow from 112.160.0.0/11 to any
 ufw allow from 112.196.0.0/17 to any
+ufw allow from 112.196.192.0/19 to any
 ufw allow from 112.197.0.0/16 to any
 ufw allow from 112.198.0.0/16 to any
 ufw allow from 112.199.0.0/17 to any
@@ -2304,6 +2309,7 @@ ufw allow from 179.54.0.0/15 to any
 ufw allow from 179.61.8.0/22 to any
 ufw allow from 179.61.128.0/17 to any
 ufw allow from 179.62.0.0/16 to any
+ufw allow from 179.63.208.0/21 to any
 ufw allow from 179.63.224.0/21 to any
 ufw allow from 179.68.0.0/14 to any
 ufw allow from 179.72.0.0/14 to any
@@ -2370,7 +2376,6 @@ ufw allow from 180.211.128.0/17 to any
 ufw allow from 180.212.0.0/15 to any
 ufw allow from 180.214.232.0/22 to any
 ufw allow from 180.215.0.0/16 to any
-ufw allow from 180.217.0.0/16 to any
 ufw allow from 180.222.160.0/20 to any
 ufw allow from 180.232.0.0/16 to any
 ufw allow from 180.233.128.0/22 to any
@@ -2423,7 +2428,6 @@ ufw allow from 181.188.128.0/18 to any
 ufw allow from 181.189.176.0/20 to any
 ufw allow from 181.191.0.0/22 to any
 ufw allow from 181.191.36.0/22 to any
-ufw allow from 181.191.68.0/22 to any
 ufw allow from 181.191.188.0/22 to any
 ufw allow from 181.191.212.0/22 to any
 ufw allow from 181.191.228.0/22 to any
@@ -2569,6 +2573,7 @@ ufw allow from 186.65.108.0/22 to any
 ufw allow from 186.80.0.0/14 to any
 ufw allow from 186.84.0.0/14 to any
 ufw allow from 186.100.0.0/16 to any
+ufw allow from 186.102.0.0/16 to any
 ufw allow from 186.108.0.0/14 to any
 ufw allow from 186.112.0.0/14 to any
 ufw allow from 186.116.0.0/14 to any
@@ -3422,6 +3427,7 @@ ufw allow from 2400:adc0::/27 to any
 ufw allow from 2400:c180::/32 to any
 ufw allow from 2400:c600::/32 to any
 ufw allow from 2400:cb00::/32 to any
+ufw allow from 2400:e5e0::/32 to any
 ufw allow from 2400:ff60::/32 to any
 ufw allow from 2401:d20::/32 to any
 ufw allow from 2401:2400::/32 to any
@@ -3558,7 +3564,7 @@ ufw allow from 2804:287c::/32 to any
 ufw allow from 2804:5234::/32 to any
 ufw allow from 2806:1000::/24 to any
 ufw allow from 2a02:ff0::/29 to any
-ufw allow from 2a02:26f0::/29 to any
+ufw allow from 2a02:26f0::/32 to any
 ufw allow from 2a02:2e00::/27 to any
 ufw allow from 2a02:8400::/25 to any
 ufw allow from 2a06:98c0::/29 to any

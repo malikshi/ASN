@@ -1,0 +1,5 @@
+# IPv4 prefixes for ASN 139242
+185.200.64.0/22
+
+# IPv6 prefixes for ASN 139242
+

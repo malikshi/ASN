@@ -1,0 +1,5 @@
+# IPv4 prefixes for ASN 203898
+185.122.0.0/22
+
+# IPv6 prefixes for ASN 203898
+

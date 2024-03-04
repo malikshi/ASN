@@ -66,11 +66,9 @@ with open(output_file, "w") as f_out:
         if network.version == 4:
             # Write the IPv4 UFW rule
             f_out.write(f"ufw allow proto tcp from {network} to any port 22,80,8080,8880,2052,2082,2086,2095,443,2053,2083,2087,2096,8443\n")
-            f_out.write(f"ufw allow proto tcp from {network} to any port 10000:59151\n")
         else:
             # Write the IPv6 UFW rule
             f_out.write(f"ufw allow proto tcp from {network} to any port 22,80,8080,8880,2052,2082,2086,2095,443,2053,2083,2087,2096,8443\n")
-            f_out.write(f"ufw allow proto tcp from {network} to any port 10000:59151\n")
 
 # Open the ip list for writing
 with open(ip_list_file, "w") as f_out:

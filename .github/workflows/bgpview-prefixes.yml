@@ -30,7 +30,7 @@ jobs:
         export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         python generate_prefixes.py
-        echo "#Extended IPv4" >> asn13335.txt
+        echo "#Extended IPv4" > asn13335.txt
         curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt
         echo "" >> asn13335.txt
         echo "#Extended IPv6" >> asn13335.txt

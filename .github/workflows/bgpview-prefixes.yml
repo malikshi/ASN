@@ -41,8 +41,8 @@ jobs:
         curl -sSL https://www.cloudflare.com/ips-v6 >> ip_list.txt
         perl -i -lne 'print unless $seen{$_}++' ip_list.txt
 
-    - name: Generate ufw rules
-      run: python generate_ufw.py
+    # - name: Generate ufw rules
+    #   run: python generate_ufw.py
 
 # Commit changed files to your repo
     - name: Git Auto Commit
@@ -52,3 +52,4 @@ jobs:
         commit_message: automatic/regular prefixes updates
         # File pattern used for `git add`. For example `src/*.js`
         file_pattern: ./*.txt
+        skip_dirty_check: false

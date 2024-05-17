@@ -1,6 +1,0 @@
-# IPv4 prefixes for ASN 32280
-50.128.0.0/9
-199.19.244.0/22
-
-# IPv6 prefixes for ASN 32280
-

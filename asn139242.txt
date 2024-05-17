@@ -1,4 +1,0 @@
-# IPv4 prefixes for ASN 139242
-
-# IPv6 prefixes for ASN 139242
-

@@ -1,4 +1,0 @@
-# IPv4 prefixes for ASN 132892
-
-# IPv6 prefixes for ASN 132892
-

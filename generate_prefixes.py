@@ -24,10 +24,14 @@ def fetch_and_process_prefixes_bgpview(asn):
     }
 
     for ip_version in parent_prefixes:
-        for prefix in data.get(f'{ip_version}_prefixes', []):  # Handle missing prefixes
+        for prefix in data.get(f'{ip_version}_prefixes', []):
             parent = prefix.get('parent', {}).get('prefix')
             if parent:
-                parent_prefixes[ip_version].add(parent)
+                try:
+                    network = ipaddress.ip_network(parent, strict=False)
+                    parent_prefixes[ip_version].add(network)  # Add the ip_network object
+                except ValueError:
+                    print(f"Error: Invalid network from bgpview.io: {parent}")
 
     return parent_prefixes['ipv4'], parent_prefixes['ipv6']
 

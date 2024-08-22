@@ -38,10 +38,10 @@ def fetch_and_process_prefixes_bgpview(asn):
 def fetch_and_process_prefixes_geoid(asn):
     try:
         result = subprocess.run(
-            ['cat', 'table.list', '|', 'grep', '-w', asn], 
-            capture_output=True, 
+            ['cat', 'table.list', '|', 'grep', '-w', asn],
+            capture_output=True,
             text=True,
-            check=True 
+            check=True
         )
         prefixes = [line.split()[0].strip() for line in result.stdout.splitlines()]  # Extract the first field (prefix)
     except subprocess.CalledProcessError as e:
@@ -100,13 +100,15 @@ else:
     print("Error fetching the ASN list file from bgpview.io")
 
 # --- From geoid ---
-# Assuming you have downloaded 'table.list' to your current directory
-with open(input_file_geoid, 'r') as f:
-    for line in f:
+response = requests.get(input_file_geoid)
+if response.status_code == 200:
+    for line in response.text.splitlines():  # Process the downloaded content
         asn = line.split('|')[0].strip()
         ipv4_prefixes, ipv6_prefixes = fetch_and_process_prefixes_geoid(asn)
         merge_and_filter_duplicates(all_ipv4_prefixes, ipv4_prefixes)
         merge_and_filter_duplicates(all_ipv6_prefixes, ipv6_prefixes)
+else:
+    print("Error fetching the ASN list file from geoid")
 
 # --- Create ip_list.txt ---
 with open(ip_list_file, "w") as f_out:

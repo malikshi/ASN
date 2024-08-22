@@ -1,4 +1,5 @@
 #!/opt/venv-python/bin/python
+import os
 import requests
 import ipaddress
 import json
@@ -37,14 +38,21 @@ def fetch_and_process_prefixes_bgpview(asn):
 
 def fetch_and_process_prefixes_geoid(asn):
     try:
+        # Download table.list if it doesn't exist
+        if not os.path.exists('table.list'):
+            response = requests.get(input_file_geoid)
+            response.raise_for_status()  # Raise an exception for bad status codes
+            with open('table.list', 'w') as f:
+                f.write(response.text)
+
         result = subprocess.run(
-            ['cat', 'table.list', '|', 'grep', '-w', asn],
+            ['grep', '-w', asn, 'table.list'],
             capture_output=True,
             text=True,
             check=True
         )
-        prefixes = [line.split()[0].strip() for line in result.stdout.splitlines()]  # Extract the first field (prefix)
-    except subprocess.CalledProcessError as e:
+        prefixes = [line.split()[0].strip() for line in result.stdout.splitlines()]
+    except (requests.exceptions.RequestException, subprocess.CalledProcessError) as e:
         print(f"Error fetching prefixes for ASN {asn} from geoid: {e}")
         return set(), set()
 

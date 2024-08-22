@@ -1,11 +1,11 @@
 #!/opt/venv-python/bin/python
-import os
 import requests
 import ipaddress
 import json
 import subprocess
+import os
 
-input_file_bgpview = "https://raw.githubusercontent.com/IPTUNNELS/IPTUNNELS/main/firewall/ASN.txt"
+input_file_asn = "https://raw.githubusercontent.com/IPTUNNELS/IPTUNNELS/main/firewall/ASN.txt"
 input_file_geoid = "https://raw.githubusercontent.com/malikshi/geoid/main/table.list"
 ip_list_file = "ip_list.txt"
 
@@ -52,7 +52,6 @@ def fetch_and_process_prefixes_geoid(asn):
             check=True
         )
         prefixes = [line.split()[0].strip() for line in result.stdout.splitlines()]
-
     except (requests.exceptions.RequestException, subprocess.CalledProcessError) as e:
         print(f"Error fetching prefixes for ASN {asn} from geoid: {e}")
         return set(), set()
@@ -75,12 +74,12 @@ def filter_unique_prefixes(prefixes, existing_prefixes):
     unique = set()
     for prefix in prefixes:
         try:
-            network = ipaddress.ip_network(prefix, strict=False)  # Allow host bits
-            if network.num_addresses > 1:  # Check if it's a valid network (more than one address)
-                unique.add(prefix)  # Add only valid networks
-                existing_prefixes.add(network)  # Add to the master list
+            network = ipaddress.ip_network(prefix, strict=False)
+            if network.num_addresses > 1:
+                unique.add(network)  # Add the ip_network object
+                existing_prefixes.add(network)
             else:
-                print(f"Warning: Skipping invalid or single-address prefix: {prefix}")  # Warning message for invalid prefixes
+                print(f"Warning: Skipping invalid or single-address prefix: {prefix}")
 
         except ValueError:
             print(f"Error: Invalid network: {prefix}")
@@ -89,35 +88,53 @@ def filter_unique_prefixes(prefixes, existing_prefixes):
     return unique
 
 def merge_and_filter_duplicates(all_prefixes, new_prefixes):
-    for prefix in new_prefixes:
-        if not any(prefix.overlaps(existing) for existing in all_prefixes):
-            all_prefixes.add(prefix)
+    for new_prefix in new_prefixes:
+        overlaps_existing = any(new_prefix.overlaps(existing) for existing in all_prefixes)
+        if not overlaps_existing:
+            all_prefixes.add(new_prefix)
+        elif overlaps_existing:
+            for existing_prefix in all_prefixes.copy():  # Iterate over a copy to avoid modifying the set while iterating
+                if new_prefix.overlaps(existing_prefix):
+                    if new_prefix.prefixlen < existing_prefix.prefixlen:  # new_prefix is more general
+                        all_prefixes.remove(existing_prefix)
+                        all_prefixes.add(new_prefix)
 
 # --- Fetch and Process ASNs from the File ---
 all_ipv4_prefixes = set()
 all_ipv6_prefixes = set()
 
-# # --- From bgpview.io ---
-# response = requests.get(input_file_bgpview)
-# if response.status_code == 200:
-#     for line in response.text.splitlines():
-#         asn = line.split('|')[0].strip()
-#         ipv4_prefixes, ipv6_prefixes = fetch_and_process_prefixes_bgpview(asn)
-#         merge_and_filter_duplicates(all_ipv4_prefixes, ipv4_prefixes)
-#         merge_and_filter_duplicates(all_ipv6_prefixes, ipv6_prefixes)
-# else:
-#     print("Error fetching the ASN list file from bgpview.io")
-
-# --- From geoid ---
-response = requests.get(input_file_geoid)
+response = requests.get(input_file_asn)
 if response.status_code == 200:
-    for line in response.text.splitlines():  # Process the downloaded content
+    for line in response.text.splitlines():
         asn = line.split('|')[0].strip()
-        ipv4_prefixes, ipv6_prefixes = fetch_and_process_prefixes_geoid(asn)
-        merge_and_filter_duplicates(all_ipv4_prefixes, ipv4_prefixes)
-        merge_and_filter_duplicates(all_ipv6_prefixes, ipv6_prefixes)
+
+        # --- From geoid ---
+        ipv4_prefixes_geoid, ipv6_prefixes_geoid = fetch_and_process_prefixes_geoid(asn)
+
+        # --- From bgpview.io ---
+        ipv4_prefixes_bgpview, ipv6_prefixes_bgpview = fetch_and_process_prefixes_bgpview(asn)
+
+        # --- Merge and deduplicate for this ASN ---
+        asn_ipv4_prefixes = set()
+        asn_ipv6_prefixes = set()
+        merge_and_filter_duplicates(asn_ipv4_prefixes, ipv4_prefixes_geoid)
+        merge_and_filter_duplicates(asn_ipv4_prefixes, ipv4_prefixes_bgpview)
+        merge_and_filter_duplicates(asn_ipv6_prefixes, ipv6_prefixes_geoid)
+        merge_and_filter_duplicates(asn_ipv6_prefixes, ipv6_prefixes_bgpview)
+
+        # --- Write to individual ASN files ---
+        with open(f"asn{asn}.txt", 'w') as f_out:
+            f_out.write(f"# IPv4 prefixes for ASN {asn}\n")
+            f_out.writelines(f"{prefix}\n" for prefix in sorted(asn_ipv4_prefixes, key=lambda x: x.network_address))
+            f_out.write("\n")
+            f_out.write(f"# IPv6 prefixes for ASN {asn}\n")
+            f_out.writelines(f"{prefix}\n" for prefix in sorted(asn_ipv6_prefixes, key=lambda x: x.network_address))
+
+        # --- Merge into the overall sets ---
+        merge_and_filter_duplicates(all_ipv4_prefixes, asn_ipv4_prefixes)
+        merge_and_filter_duplicates(all_ipv6_prefixes, asn_ipv6_prefixes)
 else:
-    print("Error fetching the ASN list file from geoid")
+    print("Error fetching the ASN list file.")
 
 # --- Create ip_list.txt ---
 with open(ip_list_file, "w") as f_out:

@@ -41,7 +41,7 @@ def fetch_and_process_prefixes_geoid(asn):
         # Download table.list if it doesn't exist
         if not os.path.exists('table.list'):
             response = requests.get(input_file_geoid)
-            response.raise_for_status()  # Raise an exception for bad status codes
+            response.raise_for_status()
             with open('table.list', 'w') as f:
                 f.write(response.text)
 
@@ -52,6 +52,7 @@ def fetch_and_process_prefixes_geoid(asn):
             check=True
         )
         prefixes = [line.split()[0].strip() for line in result.stdout.splitlines()]
+
     except (requests.exceptions.RequestException, subprocess.CalledProcessError) as e:
         print(f"Error fetching prefixes for ASN {asn} from geoid: {e}")
         return set(), set()
@@ -96,16 +97,16 @@ def merge_and_filter_duplicates(all_prefixes, new_prefixes):
 all_ipv4_prefixes = set()
 all_ipv6_prefixes = set()
 
-# --- From bgpview.io ---
-response = requests.get(input_file_bgpview)
-if response.status_code == 200:
-    for line in response.text.splitlines():
-        asn = line.split('|')[0].strip()
-        ipv4_prefixes, ipv6_prefixes = fetch_and_process_prefixes_bgpview(asn)
-        merge_and_filter_duplicates(all_ipv4_prefixes, ipv4_prefixes)
-        merge_and_filter_duplicates(all_ipv6_prefixes, ipv6_prefixes)
-else:
-    print("Error fetching the ASN list file from bgpview.io")
+# # --- From bgpview.io ---
+# response = requests.get(input_file_bgpview)
+# if response.status_code == 200:
+#     for line in response.text.splitlines():
+#         asn = line.split('|')[0].strip()
+#         ipv4_prefixes, ipv6_prefixes = fetch_and_process_prefixes_bgpview(asn)
+#         merge_and_filter_duplicates(all_ipv4_prefixes, ipv4_prefixes)
+#         merge_and_filter_duplicates(all_ipv6_prefixes, ipv6_prefixes)
+# else:
+#     print("Error fetching the ASN list file from bgpview.io")
 
 # --- From geoid ---
 response = requests.get(input_file_geoid)

@@ -1,0 +1,3 @@
+# IPv4 prefixes for ASN 139452
+
+# IPv6 prefixes for ASN 139452

@@ -1,0 +1,6 @@
+# IPv4 prefixes for ASN 55674
+101.203.168.0/22
+103.185.194.0/23
+
+# IPv6 prefixes for ASN 55674
+2405:b40::/32

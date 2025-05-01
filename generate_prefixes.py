@@ -19,22 +19,36 @@ def fetch_and_process_prefixes_bgpview(asn):
         print(f"Error: Issue fetching or parsing data for ASN {asn}")
         return set(), set()
 
-    parent_prefixes = {
+    prefixes = {
         'ipv4': set(),
         'ipv6': set()
     }
 
-    for ip_version in parent_prefixes:
-        for prefix in data.get(f'{ip_version}_prefixes', []):
-            parent = prefix.get('parent', {}).get('prefix')
-            if parent:
+    for ip_version in prefixes:
+        for prefix_data in data.get(f'{ip_version}_prefixes', []):
+            # prefix_str = prefix_data.get('parent', {}).get('prefix') # this for get parent prefix
+            prefix_str = prefix_data.get('prefix') # this for prefix instead of parent prefix
+            if prefix_str:
                 try:
-                    network = ipaddress.ip_network(parent, strict=False)
-                    parent_prefixes[ip_version].add(network)  # Add the ip_network object
+                    network = ipaddress.ip_network(prefix_str, strict=False)
+                    prefixes[ip_version].add(network)  # Add the ip_network object
                 except ValueError:
-                    print(f"Error: Invalid network from bgpview.io: {parent}")
+                    print(f"Error: Invalid network from bgpview.io: {prefix_str}")
 
-    return parent_prefixes['ipv4'], parent_prefixes['ipv6']
+    return prefixes['ipv4'], prefixes['ipv6']
+
+    # for ip_version in parent_prefixes:
+    #     for prefix in data.get(f'{ip_version}_prefixes', []):
+    #         # parent = prefix.get('parent', {}).get('prefix')
+    #         parent = prefix.get('prefix')
+    #         if parent:
+    #             try:
+    #                 network = ipaddress.ip_network(parent, strict=False)
+    #                 parent_prefixes[ip_version].add(network)  # Add the ip_network object
+    #             except ValueError:
+    #                 print(f"Error: Invalid network from bgpview.io: {parent}")
+
+    # return parent_prefixes['ipv4'], parent_prefixes['ipv6']
 
 def fetch_and_process_prefixes_geoid(asn):
     try:

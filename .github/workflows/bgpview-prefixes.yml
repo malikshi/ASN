@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "20 04 * * *"
+    - cron: "20 04 * * FRI"
   workflow_dispatch:
 
 jobs:

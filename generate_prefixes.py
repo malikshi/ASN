@@ -4,51 +4,91 @@ import ipaddress
 import json
 import subprocess
 import os
+import gzip
+from collections import defaultdict
 
+# --- Configuration ---
 input_file_asn = "https://raw.githubusercontent.com/IPTUNNELS/IPTUNNELS/main/firewall/ASN.txt"
 input_file_geoid = "https://raw.githubusercontent.com/malikshi/geoid/main/table.list"
 ip_list_file = "ip_list.txt"
 
-def fetch_and_process_prefixes_bgpview(asn):
-    url = f'https://api.bgpview.io/asn/{asn}/prefixes'
-    response = requests.get(url)
+# --- IPInfo Configuration ---
+IPINFO_URL = "https://ipinfo.io/data/ipinfo_lite.json.gz?token=11d8ba16d9d324"
+IPINFO_FILE = "ipinfo_lite.json.gz"
+
+def update_ipinfo_database():
+    """
+    Downloads the latest ipinfo database.
+    Falls back to local file if download fails.
+    Returns True if a usable file exists, False otherwise.
+    """
+    print(f"Attempting to download latest DB from ipinfo...")
+    try:
+        # Stream download to avoid high memory usage during download
+        # Uses verify=True for security, can be set to False if env has cert issues
+        response = requests.get(IPINFO_URL, stream=True, timeout=60)
+        
+        if response.status_code == 200:
+            with open(IPINFO_FILE, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            print("Download successful. Updated local database.")
+            return True
+        else:
+            print(f"Download failed with status code: {response.status_code}")
+    except Exception as e:
+        print(f"Download failed due to error: {e}")
+
+    # Fallback check
+    if os.path.exists(IPINFO_FILE):
+        print("Using existing local database.")
+        return True
+    else:
+        print("Critical Error: No local database found and download failed.")
+        return False
+
+def load_ipinfo_database():
+    """
+    Parses the compressed newline-delimited JSON file.
+    Returns a dictionary mapping ASN (string, no 'AS' prefix) to {'ipv4': set(), 'ipv6': set()}
+    """
+    print("Loading and parsing ipinfo database into memory...")
+    data_map = defaultdict(lambda: {'ipv4': set(), 'ipv6': set()})
+    
+    if not os.path.exists(IPINFO_FILE):
+        return None
 
     try:
-        data = response.json()['data']
-    except (KeyError, json.JSONDecodeError):
-        print(f"Error: Issue fetching or parsing data for ASN {asn}")
-        return set(), set()
-
-    prefixes = {
-        'ipv4': set(),
-        'ipv6': set()
-    }
-
-    for ip_version in prefixes:
-        for prefix_data in data.get(f'{ip_version}_prefixes', []):
-            # prefix_str = prefix_data.get('parent', {}).get('prefix') # this for get parent prefix
-            prefix_str = prefix_data.get('prefix') # this for prefix instead of parent prefix
-            if prefix_str:
+        with gzip.open(IPINFO_FILE, 'rt', encoding='utf-8') as f:
+            for line in f:
                 try:
-                    network = ipaddress.ip_network(prefix_str, strict=False)
-                    prefixes[ip_version].add(network)  # Add the ip_network object
-                except ValueError:
-                    print(f"Error: Invalid network from bgpview.io: {prefix_str}")
-
-    return prefixes['ipv4'], prefixes['ipv6']
-
-    # for ip_version in parent_prefixes:
-    #     for prefix in data.get(f'{ip_version}_prefixes', []):
-    #         # parent = prefix.get('parent', {}).get('prefix')
-    #         parent = prefix.get('prefix')
-    #         if parent:
-    #             try:
-    #                 network = ipaddress.ip_network(parent, strict=False)
-    #                 parent_prefixes[ip_version].add(network)  # Add the ip_network object
-    #             except ValueError:
-    #                 print(f"Error: Invalid network from bgpview.io: {parent}")
-
-    # return parent_prefixes['ipv4'], parent_prefixes['ipv6']
+                    entry = json.loads(line)
+                    # Sample format: {"network": "1.0.0.0/24", "asn": "AS13335", ...}
+                    asn_raw = entry.get('asn', '')
+                    network_str = entry.get('network', '')
+                    
+                    if asn_raw and network_str:
+                        # Strip 'AS' prefix to match ASN.txt format (usually numbers like '13335')
+                        asn = asn_raw.upper().replace('AS', '')
+                        
+                        try:
+                            network = ipaddress.ip_network(network_str, strict=False)
+                            if network.version == 4:
+                                data_map[asn]['ipv4'].add(network)
+                            else:
+                                data_map[asn]['ipv6'].add(network)
+                        except ValueError:
+                            # Invalid network string, skip
+                            continue
+                            
+                except json.JSONDecodeError:
+                    continue
+    except Exception as e:
+        print(f"Error reading database file: {e}")
+        return None
+        
+    print(f"Database loaded. Found entries for {len(data_map)} ASNs.")
+    return data_map
 
 def fetch_and_process_prefixes_geoid(asn):
     try:
@@ -117,24 +157,45 @@ def merge_and_filter_duplicates(all_prefixes, new_prefixes):
 all_ipv4_prefixes = set()
 all_ipv6_prefixes = set()
 
+# 1. Prepare IPInfo Database
+if update_ipinfo_database():
+    ipinfo_db = load_ipinfo_database()
+else:
+    print("Skipping IPInfo processing due to missing database.")
+    ipinfo_db = None
+
+print("Fetching ASN list...")
 response = requests.get(input_file_asn)
+
 if response.status_code == 200:
     for line in response.text.splitlines():
+        if not line.strip() or line.startswith('#'):
+            continue
+            
         asn = line.split('|')[0].strip()
 
         # --- From geoid ---
         ipv4_prefixes_geoid, ipv6_prefixes_geoid = fetch_and_process_prefixes_geoid(asn)
 
-        # --- From bgpview.io ---
-        ipv4_prefixes_bgpview, ipv6_prefixes_bgpview = fetch_and_process_prefixes_bgpview(asn)
+        # --- From ipinfo (Local DB) ---
+        ipv4_prefixes_ipinfo = set()
+        ipv6_prefixes_ipinfo = set()
+        
+        if ipinfo_db and asn in ipinfo_db:
+            ipv4_prefixes_ipinfo = ipinfo_db[asn]['ipv4']
+            ipv6_prefixes_ipinfo = ipinfo_db[asn]['ipv6']
 
         # --- Merge and deduplicate for this ASN ---
         asn_ipv4_prefixes = set()
         asn_ipv6_prefixes = set()
+        
+        # Merge Geoid
         merge_and_filter_duplicates(asn_ipv4_prefixes, ipv4_prefixes_geoid)
-        merge_and_filter_duplicates(asn_ipv4_prefixes, ipv4_prefixes_bgpview)
         merge_and_filter_duplicates(asn_ipv6_prefixes, ipv6_prefixes_geoid)
-        merge_and_filter_duplicates(asn_ipv6_prefixes, ipv6_prefixes_bgpview)
+        
+        # Merge IPInfo
+        merge_and_filter_duplicates(asn_ipv4_prefixes, ipv4_prefixes_ipinfo)
+        merge_and_filter_duplicates(asn_ipv6_prefixes, ipv6_prefixes_ipinfo)
 
         # --- Write to individual ASN files ---
         with open(f"asn{asn}.txt", 'w') as f_out:

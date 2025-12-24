@@ -26,6 +26,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Generate prefixes
+      env:
+        IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
       run: |
         # export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         # export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}

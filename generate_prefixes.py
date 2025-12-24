@@ -13,7 +13,8 @@ input_file_geoid = "https://raw.githubusercontent.com/malikshi/geoid/main/table.
 ip_list_file = "ip_list.txt"
 
 # --- IPInfo Configuration ---
-IPINFO_URL = "https://ipinfo.io/data/ipinfo_lite.json.gz?token=11d8ba16d9d324"
+IPINFO_TOKEN = os.environ.get("IPINFO_TOKEN", "")
+IPINFO_URL = f"https://ipinfo.io/data/ipinfo_lite.json.gz?token={IPINFO_TOKEN}"
 IPINFO_FILE = "ipinfo_lite.json.gz"
 
 def update_ipinfo_database():

@@ -256,12 +256,6 @@ for source in SOURCES:
         merge_and_filter_duplicates(asn_ipv4, ipv4_ipinfo)
         merge_and_filter_duplicates(asn_ipv6, ipv6_ipinfo)
         
-        # Cloudflare explicit merge (ASN 13335)
-        if asn == "13335":
-            print(f"Merging Cloudflare direct IPs into ASN {asn}...")
-            merge_and_filter_duplicates(asn_ipv4, cf_ipv4)
-            merge_and_filter_duplicates(asn_ipv6, cf_ipv6)
-
         # Write ASN specific files
         file_basename = f"asn{asn}"
         write_formats(base_dir, file_basename, asn_ipv4, asn_ipv6)
@@ -270,6 +264,14 @@ for source in SOURCES:
         if source["need_aggregate"]:
             merge_and_filter_duplicates(all_source_ipv4, asn_ipv4)
             merge_and_filter_duplicates(all_source_ipv6, asn_ipv6)
+
+    # Process explicit external IPs for default source
+    if source["name"] == "default":
+        print("Processing explicit Cloudflare IPs (ASN 13335)...")
+        write_formats(base_dir, "asn13335", cf_ipv4, cf_ipv6)
+        if source["need_aggregate"]:
+            merge_and_filter_duplicates(all_source_ipv4, cf_ipv4)
+            merge_and_filter_duplicates(all_source_ipv6, cf_ipv6)
 
     # Write aggregated file for this source
     if source["need_aggregate"]:

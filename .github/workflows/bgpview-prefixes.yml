@@ -14,6 +14,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: "Setup sing-box"
+      env:
+        SING_BOX_DEB_URL: "https://github.com/SagerNet/sing-box/releases/download/v1.13.4/sing-box_1.13.4_linux_amd64.deb"
+      run: |
+          set -Eeuo pipefail
+          wget -O sing-box.deb $SING_BOX_DEB_URL
+          sudo dpkg -i sing-box.deb
+
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
@@ -29,29 +37,12 @@ jobs:
       env:
         IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
       run: |
-        # export HTTP_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
-        # export HTTPS_PROXY=socks5://${{ secrets.IP_ADDRESS }}:${{ secrets.PORT }}
         python generate_prefixes.py
-        echo "# IPv4 prefixes for ASN 13335" > asn13335.txt
-        curl -sSL https://www.cloudflare.com/ips-v4 >> asn13335.txt
-        echo "" >> asn13335.txt
-        echo "# IPv6 prefixes for ASN 13335" >> asn13335.txt
-        curl -sSL https://www.cloudflare.com/ips-v6 >> asn13335.txt
-        perl -i -lne 'print unless $seen{$_}++' asn13335.txt
-        curl -sSL https://www.cloudflare.com/ips-v4 >> ip_list.txt
-        echo "" >> ip_list.txt
-        curl -sSL https://www.cloudflare.com/ips-v6 >> ip_list.txt
-        perl -i -lne 'print unless $seen{$_}++' ip_list.txt
 
-    # - name: Generate ufw rules
-    #   run: python generate_ufw.py
-
-# Commit changed files to your repo
-    - name: Git Auto Commit
-      uses: stefanzweifel/git-auto-commit-action@v4.16.0
+    - name: Deploy to release branch
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        # Commit message
-        commit_message: automatic/regular prefixes updates
-        # File pattern used for `git add`. For example `src/*.js`
-        file_pattern: './*.txt *.gz'
-        skip_dirty_check: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: release
+        publish_dir: ./build
+        keep_files: false

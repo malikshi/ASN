@@ -46,3 +46,9 @@ jobs:
         publish_branch: release
         publish_dir: ./build
         keep_files: false
+
+    - name: Git Auto Commit
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "chore: update ipinfo local database"
+        file_pattern: '*.gz'

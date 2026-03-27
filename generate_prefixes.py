@@ -184,7 +184,7 @@ def write_formats(base_dir, name, ipv4_prefixes, ipv6_prefixes):
         
     # Write srs formats
     srs_json = {
-        "version": 1,
+        "version": 3,
         "rules": [
             {
                 "ip_cidr": all_strs

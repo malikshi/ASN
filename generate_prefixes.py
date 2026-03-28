@@ -22,7 +22,7 @@ SOURCES = [
     }
 ]
 
-input_file_geoid = "https://raw.githubusercontent.com/malikshi/geoid/main/table.list"
+input_file_geoid = "https://raw.githubusercontent.com/malikshi/geoid/refs/heads/data/table.txt"
 IPINFO_TOKEN = os.environ.get("IPINFO_TOKEN", "")
 IPINFO_URL = f"https://ipinfo.io/data/ipinfo_lite.json.gz?token={IPINFO_TOKEN}"
 IPINFO_FILE = "ipinfo_lite.json.gz"
@@ -86,14 +86,14 @@ def load_ipinfo_database():
 
 def fetch_and_process_prefixes_geoid(asn):
     try:
-        if not os.path.exists('table.list'):
+        if not os.path.exists('table.txt'):
             response = requests.get(input_file_geoid)
             response.raise_for_status()
-            with open('table.list', 'w') as f:
+            with open('table.txt', 'w') as f:
                 f.write(response.text)
 
         result = subprocess.run(
-            ['grep', '-w', asn, 'table.list'],
+            ['grep', '-w', asn, 'table.txt'],
             capture_output=True,
             text=True,
             check=False  # Ignore errors if grep finds nothing
